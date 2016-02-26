@@ -1,5 +1,7 @@
 package trivia;
 
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.Random;
 
 
@@ -7,9 +9,14 @@ public class GameRunner {
 
     public static final int SEED = 42;
     private static boolean notAWinner;
+    private final PrintStream printStream;
 
-    public static void main(String[] args) {
-        Game aGame = new Game();
+    public GameRunner(PrintStream printStream) {
+        this.printStream = printStream;
+    }
+
+    public void run() {
+        Game aGame = new Game(printStream);
 
         aGame.add("Chet");
         aGame.add("Pat");
