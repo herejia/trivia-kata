@@ -2,6 +2,7 @@ package trivia;
 
 import trivia.announcement.AnnouncePrinter;
 import trivia.announcement.OutputStreamAnnouncePrinter;
+import trivia.gold.GoldFactory;
 import trivia.place.PlaceFactory;
 import trivia.player.*;
 
@@ -13,7 +14,6 @@ public class Game {
     private final PlayersAnnouncer playersAnnouncer;
     private final PrintStream outputStream;
     private final Players players;
-    int[] purses = new int[6];
     boolean[] inPenaltyBox = new boolean[6];
 
     LinkedList popQuestions = new LinkedList();
@@ -25,11 +25,13 @@ public class Game {
     boolean isGettingOutOfPenaltyBox;
     private final PlayerFactory playerFactory;
     private final PlaceFactory placeFactory;
+    private final GoldFactory goldFactory;
 
     public Game(PrintStream outputStream) {
         this.outputStream = outputStream;
         this.playerFactory = new PlayerFactory();
         this.placeFactory = new PlaceFactory();
+        this.goldFactory = new GoldFactory();
         this.players = new Players();
         for (int i = 0; i < 50; i++) {
             popQuestions.addLast("Pop Question " + i);
@@ -48,10 +50,9 @@ public class Game {
     public boolean add(String playerName) {
         Player player = playerFactory.create(playerName);
         player.setPlace(placeFactory.createStartingPlace());
+        player.setGoldAmount(goldFactory.create(0));
         players.add(player);
-        purses[players.count().intValue()] = 0;
         inPenaltyBox[players.count().intValue()] = false;
-
         playersAnnouncer.announceLastAddedPlayer(announcePrinter);
         playersAnnouncer.announcePlayerCount(announcePrinter);
         return true;
@@ -185,11 +186,11 @@ public class Game {
     }
 
     private void announceCurrentPlayerGoldCoins() {
-        outputStream.println(getCurrentPlayerName() + " now has " + purses[currentPlayerIndex] + " Gold Coins.");
+        currentPlayerAnnouncer().announceGoldAmount(announcePrinter);
     }
 
     private void incrementPlayerGold() {
-        purses[currentPlayerIndex]++;
+        getCurrentPlayer().incrementGoldAmount();
     }
 
     private void announceCorrectAnswer() {
@@ -219,7 +220,7 @@ public class Game {
 
 
     private boolean didCurrentPlayerWin() {
-        return !(purses[currentPlayerIndex] == 6);
+        return !getCurrentPlayer().hasWinningGoldAmount();
     }
 
 }

@@ -30,4 +30,9 @@ public class PlayerAnnouncer {
         Message message = MessageFactory.createSentInPenaltyBox(currentPlayer);
         announcePrinter.print(message);
     }
+
+    public void announceGoldAmount(AnnouncePrinter announcePrinter) {
+        Message message = MessageFactory.createGoldAmount(currentPlayer);
+        announcePrinter.print(message);
+    }
 }

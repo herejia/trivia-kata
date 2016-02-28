@@ -33,4 +33,8 @@ public class MessageFactory {
     public static Message createSentInPenaltyBox(Player currentPlayer) {
         return createForText(currentPlayer.getName() + " was sent to the penalty box");
     }
+
+    public static Message createGoldAmount(Player player) {
+        return createForText(player.getName() + " now has " + player.getGoldAmount() + " Gold Coins.");
+    }
 }
