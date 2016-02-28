@@ -4,6 +4,10 @@ import trivia.player.Player;
 import trivia.player.PlayerCount;
 
 public class MessageFactory {
+    private static Message createForText(String text) {
+        return new Message(text);
+    }
+
     public static Message createPlayerAdded(Player player) {
         String text = player.getName() + " was added";
         return createForText(text);
@@ -14,7 +18,19 @@ public class MessageFactory {
         return createForText(text);
     }
 
-    private static Message createForText(String text) {
-        return new Message(text);
+    public static Message createOutOfPenaltyBox(Player player) {
+        return createForText(player.getName() + " is getting out of the penalty box");
+    }
+
+    public static Message createNotOutOfPenaltyBox(Player player) {
+        return createForText(player.getName() + " is not getting out of the penalty box");
+    }
+
+    public static Message createCurrentPlayer(Player player) {
+        return createForText(player.getName() + " is the current player");
+    }
+
+    public static Message createSentInPenaltyBox(Player currentPlayer) {
+        return createForText(currentPlayer.getName() + " was sent to the penalty box");
     }
 }

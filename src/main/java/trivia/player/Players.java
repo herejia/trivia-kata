@@ -1,7 +1,5 @@
 package trivia.player;
 
-import trivia.announcement.AnnouncePrinter;
-
 import java.util.ArrayList;
 import java.util.List;
 

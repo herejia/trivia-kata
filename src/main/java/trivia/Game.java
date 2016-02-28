@@ -2,10 +2,7 @@ package trivia;
 
 import trivia.announcement.AnnouncePrinter;
 import trivia.announcement.OutputStreamAnnouncePrinter;
-import trivia.player.Player;
-import trivia.player.PlayerFactory;
-import trivia.player.Players;
-import trivia.player.PlayersAnnouncer;
+import trivia.player.*;
 
 import java.io.PrintStream;
 import java.util.LinkedList;
@@ -14,7 +11,7 @@ public class Game {
     private final AnnouncePrinter announcePrinter;
     private final PlayersAnnouncer playersAnnouncer;
     private final PrintStream outputStream;
-    private Players players;
+    private final Players players;
     int[] places = new int[6];
     int[] purses = new int[6];
     boolean[] inPenaltyBox = new boolean[6];
@@ -59,26 +56,26 @@ public class Game {
     }
 
     public void roll(int roll) {
-        announceCurrentPlayer();
+        currentPlayerAnnouncer().announcePlayerAsCurrent(announcePrinter);
         announceRoll(roll);
 
         if (isCurrentPlayerInPenaltyBox()) {
             if (roll % 2 != 0) {
                 setPlayerOutOfPenaltyBox();
 
-                announcePlayerOutOfPenaltyBox();
+                currentPlayerAnnouncer().announceIsGettingOutOfPenaltyBox(announcePrinter);
                 movePlayer(roll);
 
-                announcePlayerNewOPlace();
+                announcePlayerNewPlace();
                 announceCurrentCategory();
                 askQuestion();
             } else {
-                announcePlayerStaysInPenaltyBox();
+                currentPlayerAnnouncer().announceIsNotGettingOutOfThePenaltyBox(announcePrinter);
                 setPlayerGettingOutOfPenaltyBox();
             }
         } else {
             movePlayer(roll);
-            announcePlayerNewOPlace();
+            announcePlayerNewPlace();
             announceCurrentCategory();
             askQuestion();
         }
@@ -89,19 +86,11 @@ public class Game {
         isGettingOutOfPenaltyBox = false;
     }
 
-    private void announcePlayerStaysInPenaltyBox() {
-        announcePlayerStaysInPenaltyBox(getCurrentPlayerName() + " is not getting out of the penalty box");
-    }
-
-    private void announcePlayerStaysInPenaltyBox(String s) {
-        outputStream.println(s);
-    }
-
     private void announceCurrentCategory() {
         outputStream.println("The category is " + currentCategory());
     }
 
-    private void announcePlayerNewOPlace() {
+    private void announcePlayerNewPlace() {
         outputStream.println(getCurrentPlayerName()
                 + "'s new location is "
                 + places[currentPlayerIndex]);
@@ -121,13 +110,8 @@ public class Game {
         if (places[currentPlayerIndex] > 11) places[currentPlayerIndex] = places[currentPlayerIndex] - 12;
     }
 
-    private void announcePlayerOutOfPenaltyBox() {
-        currentPlayerAnnouncer().announceIsGettingOutOfPenaltyBox();
-        outputStream.println(getCurrentPlayerName() + " is getting out of the penalty box");
-    }
-
     private PlayerAnnouncer currentPlayerAnnouncer() {
-        return this.playerAnnouncer;
+        return new PlayerAnnouncer(getCurrentPlayer());
     }
 
     private void setPlayerOutOfPenaltyBox() {
@@ -140,10 +124,6 @@ public class Game {
 
     private void announceRoll(int roll) {
         outputStream.println("They have rolled a " + roll);
-    }
-
-    private void announceCurrentPlayer() {
-        outputStream.println(getCurrentPlayerName() + " is the current player");
     }
 
     private void askQuestion() {
@@ -221,7 +201,7 @@ public class Game {
 
     public boolean wrongAnswer() {
         announceWrongAnswer();
-        announcePlayerInPenaltyBox();
+        currentPlayerAnnouncer().announceSentInPenaltyBox(announcePrinter);
         setPlayerInPenaltyBox();
 
         nextPlayer();
@@ -230,10 +210,6 @@ public class Game {
 
     private void setPlayerInPenaltyBox() {
         inPenaltyBox[currentPlayerIndex] = true;
-    }
-
-    private void announcePlayerInPenaltyBox() {
-        outputStream.println(getCurrentPlayerName() + " was sent to the penalty box");
     }
 
     private void announceWrongAnswer() {
