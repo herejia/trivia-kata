@@ -21,4 +21,8 @@ public class Players {
     public Player get(int index) {
         return players.get(index);
     }
+
+    public boolean contains(Player player) {
+        return players.contains(player);
+    }
 }

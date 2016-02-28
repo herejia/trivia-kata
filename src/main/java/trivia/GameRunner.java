@@ -25,12 +25,13 @@ public class GameRunner {
 
         do {
 
-            aGame.roll(rand.nextInt(5) + 1);
+            int roll = rand.nextInt(5) + 1;
+            aGame.roll(roll);
 
             if (rand.nextInt(9) == 7) {
                 notAWinner = aGame.wrongAnswer();
             } else {
-                notAWinner = aGame.wasCorrectlyAnswered();
+                notAWinner = aGame.wasCorrectlyAnswered(roll);
             }
 
 

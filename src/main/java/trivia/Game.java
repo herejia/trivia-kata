@@ -12,7 +12,7 @@ public class Game {
     private final PlayersAnnouncer playersAnnouncer;
     private final PrintStream outputStream;
     private final InGamePlayers inGamePlayers;
-    boolean[] inPenaltyBox = new boolean[6];
+    private final PenaltyBox penaltyBox;
 
     LinkedList popQuestions = new LinkedList();
     LinkedList scienceQuestions = new LinkedList();
@@ -20,7 +20,7 @@ public class Game {
     LinkedList rockQuestions = new LinkedList();
 
     int currentPlayerIndex = 0;
-    boolean isGettingOutOfPenaltyBox;
+    LeavingZone leavingZone = new LeavingZone();
     private final PlayerFactory playerFactory;
 
     public Game(PrintStream outputStream) {
@@ -35,6 +35,7 @@ public class Game {
         }
         announcePrinter = new OutputStreamAnnouncePrinter(outputStream);
         playersAnnouncer = new PlayersAnnouncer(inGamePlayers);
+        penaltyBox = new PenaltyBox();
     }
 
     public String createRockQuestion(int index) {
@@ -44,7 +45,6 @@ public class Game {
     public boolean add(String playerName) {
         Player player = playerFactory.create(playerName);
         inGamePlayers.add(player);
-        inPenaltyBox[inGamePlayers.count().intValue()] = false;
         playersAnnouncer.announceLastAddedPlayer(announcePrinter);
         playersAnnouncer.announcePlayerCount(announcePrinter);
         return true;
@@ -54,9 +54,9 @@ public class Game {
         currentPlayerAnnouncer().announcePlayerAsCurrent(announcePrinter);
         announceRoll(roll);
 
-        if (isCurrentPlayerInPenaltyBox()) {
+        if (penaltyBox.detains(getCurrentPlayer())) {
             if (roll % 2 != 0) {
-                setPlayerOutOfPenaltyBox();
+                leavingZone.leaving();
 
                 currentPlayerAnnouncer().announceIsGettingOutOfPenaltyBox(announcePrinter);
                 getCurrentPlayer().move(roll);
@@ -66,7 +66,7 @@ public class Game {
                 askQuestion();
             } else {
                 currentPlayerAnnouncer().announceIsNotGettingOutOfThePenaltyBox(announcePrinter);
-                setPlayerGettingOutOfPenaltyBox();
+                leavingZone.staying();
             }
         } else {
             getCurrentPlayer().move(roll);
@@ -75,10 +75,6 @@ public class Game {
             askQuestion();
         }
 
-    }
-
-    private void setPlayerGettingOutOfPenaltyBox() {
-        isGettingOutOfPenaltyBox = false;
     }
 
     private void announceCurrentCategory() {
@@ -102,14 +98,6 @@ public class Game {
 
     private PlayerAnnouncer currentPlayerAnnouncer() {
         return new PlayerAnnouncer(getCurrentPlayer());
-    }
-
-    private void setPlayerOutOfPenaltyBox() {
-        isGettingOutOfPenaltyBox = true;
-    }
-
-    private boolean isCurrentPlayerInPenaltyBox() {
-        return inPenaltyBox[currentPlayerIndex];
     }
 
     private void announceRoll(int roll) {
@@ -145,9 +133,9 @@ public class Game {
         return getCurrentPlayer().getPlace().intValue();
     }
 
-    public boolean wasCorrectlyAnswered() {
-        if (isCurrentPlayerInPenaltyBox()) {
-            if (isGettingOutOfPenaltyBox()) {
+    public boolean wasCorrectlyAnswered(int roll) {
+        if (penaltyBox.detains(getCurrentPlayer())) {
+            if (leavingZone.isLeaving()) {
                 announceCorrectAnswer();
                 incrementPlayerGold();
                 announceCurrentPlayerGoldCoins();
@@ -189,21 +177,13 @@ public class Game {
         outputStream.println("Answer was correct!!!!");
     }
 
-    private boolean isGettingOutOfPenaltyBox() {
-        return isGettingOutOfPenaltyBox;
-    }
-
     public boolean wrongAnswer() {
         announceWrongAnswer();
         currentPlayerAnnouncer().announceSentInPenaltyBox(announcePrinter);
-        setPlayerInPenaltyBox();
+        penaltyBox.detain(getCurrentPlayer());
 
         nextPlayer();
         return true;
-    }
-
-    private void setPlayerInPenaltyBox() {
-        inPenaltyBox[currentPlayerIndex] = true;
     }
 
     private void announceWrongAnswer() {
@@ -215,4 +195,23 @@ public class Game {
         return !getCurrentPlayer().hasWinningGoldAmount();
     }
 
+    class LeavingZone {
+        private Boolean isLeaving;
+
+        LeavingZone() {
+            isLeaving = true;
+        }
+
+        public void leaving() {
+            this.isLeaving = true;
+        }
+
+        public void staying() {
+            this.isLeaving = false;
+        }
+
+        public boolean isLeaving() {
+            return isLeaving;
+        }
+    }
 }
