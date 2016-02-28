@@ -3,10 +3,11 @@ package trivia;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 public class Game {
     private final PrintStream outputStream;
-    ArrayList players = new ArrayList();
+    private List<String> playerNames = new ArrayList<>();
     int[] places = new int[6];
     int[] purses = new int[6];
     boolean[] inPenaltyBox = new boolean[6];
@@ -34,9 +35,7 @@ public class Game {
     }
 
     public boolean add(String playerName) {
-
-
-        players.add(playerName);
+        playerNames.add(playerName);
         places[howManyPlayers()] = 0;
         purses[howManyPlayers()] = 0;
         inPenaltyBox[howManyPlayers()] = false;
@@ -47,7 +46,11 @@ public class Game {
     }
 
     private void announcePlayerCount() {
-        outputStream.println("They are player number " + players.size());
+        outputStream.println("They are player number " + getPlayersCount());
+    }
+
+    private int getPlayersCount() {
+        return playerNames.size();
     }
 
     private void announcePlayerWasAdded(String playerName) {
@@ -55,7 +58,7 @@ public class Game {
     }
 
     public int howManyPlayers() {
-        return players.size();
+        return getPlayersCount();
     }
 
     public void roll(int roll) {
@@ -90,7 +93,7 @@ public class Game {
     }
 
     private void announcePlayerStaysInPenaltyBox() {
-        announcePlayerStaysInPenaltyBox(players.get(currentPlayer) + " is not getting out of the penalty box");
+        announcePlayerStaysInPenaltyBox(getCurrentPlayerName() + " is not getting out of the penalty box");
     }
 
     private void announcePlayerStaysInPenaltyBox(String s) {
@@ -102,9 +105,13 @@ public class Game {
     }
 
     private void announcePlayerNewOPlace() {
-        outputStream.println(players.get(currentPlayer)
+        outputStream.println(getCurrentPlayerName()
                 + "'s new location is "
                 + places[currentPlayer]);
+    }
+
+    private String getCurrentPlayerName() {
+        return playerNames.get(currentPlayer);
     }
 
     private void movePlayer(int steps) {
@@ -113,7 +120,7 @@ public class Game {
     }
 
     private void announcePlayerOutOfPenaltyBox() {
-        outputStream.println(players.get(currentPlayer) + " is getting out of the penalty box");
+        outputStream.println(getCurrentPlayerName() + " is getting out of the penalty box");
     }
 
     private void setPlayerOutOfPenaltyBox() {
@@ -129,7 +136,7 @@ public class Game {
     }
 
     private void announceCurrentPlayer() {
-        outputStream.println(players.get(currentPlayer) + " is the current player");
+        outputStream.println(getCurrentPlayerName() + " is the current player");
     }
 
     private void askQuestion() {
@@ -186,11 +193,11 @@ public class Game {
 
     private void nextPlayer() {
         currentPlayer++;
-        if (currentPlayer == players.size()) currentPlayer = 0;
+        if (currentPlayer == getPlayersCount()) currentPlayer = 0;
     }
 
     private void announceCurrentPlayerGoldCoins() {
-        outputStream.println(players.get(currentPlayer) + " now has " + purses[currentPlayer] + " Gold Coins.");
+        outputStream.println(getCurrentPlayerName() + " now has " + purses[currentPlayer] + " Gold Coins.");
     }
 
     private void incrementPlayerGold() {
@@ -219,7 +226,7 @@ public class Game {
     }
 
     private void announcePlayerInPenaltyBox() {
-        outputStream.println(players.get(currentPlayer) + " was sent to the penalty box");
+        outputStream.println(getCurrentPlayerName() + " was sent to the penalty box");
     }
 
     private void announceWrongAnswer() {
