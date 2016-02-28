@@ -20,7 +20,6 @@ public class Game {
     LinkedList rockQuestions = new LinkedList();
 
     int currentPlayerIndex = 0;
-    LeavingZone leavingZone = new LeavingZone();
     private final PlayerFactory playerFactory;
 
     public Game(PrintStream outputStream) {
@@ -70,12 +69,10 @@ public class Game {
     }
 
     private void onEvenRollInPenaltyBox() {
-        leavingZone.staying();
         currentPlayerAnnouncer().announceIsNotGettingOutOfThePenaltyBox(announcePrinter);
     }
 
     private void onOddRollInPenaltyBox(Roll roll) {
-        leavingZone.leaving();
         currentPlayerAnnouncer().announceIsGettingOutOfPenaltyBox(announcePrinter);
         getCurrentPlayer().move(roll.intValue());
         announcePlayerNewPlace();
@@ -199,25 +196,5 @@ public class Game {
 
     private boolean didCurrentPlayerWin() {
         return !getCurrentPlayer().hasWinningGoldAmount();
-    }
-
-    class LeavingZone {
-        private Boolean isLeaving;
-
-        LeavingZone() {
-            isLeaving = true;
-        }
-
-        public void leaving() {
-            this.isLeaving = true;
-        }
-
-        public void staying() {
-            this.isLeaving = false;
-        }
-
-        public boolean isLeaving() {
-            return isLeaving;
-        }
     }
 }
