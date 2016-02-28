@@ -2,8 +2,6 @@ package trivia;
 
 import trivia.announcement.AnnouncePrinter;
 import trivia.announcement.OutputStreamAnnouncePrinter;
-import trivia.gold.GoldFactory;
-import trivia.place.PlaceFactory;
 import trivia.player.*;
 
 import java.io.PrintStream;
@@ -24,14 +22,10 @@ public class Game {
     int currentPlayerIndex = 0;
     boolean isGettingOutOfPenaltyBox;
     private final PlayerFactory playerFactory;
-    private final PlaceFactory placeFactory;
-    private final GoldFactory goldFactory;
 
     public Game(PrintStream outputStream) {
         this.outputStream = outputStream;
         this.playerFactory = new PlayerFactory();
-        this.placeFactory = new PlaceFactory();
-        this.goldFactory = new GoldFactory();
         this.players = new Players();
         for (int i = 0; i < 50; i++) {
             popQuestions.addLast("Pop Question " + i);
@@ -49,8 +43,6 @@ public class Game {
 
     public boolean add(String playerName) {
         Player player = playerFactory.create(playerName);
-        player.setPlace(placeFactory.createStartingPlace());
-        player.setGoldAmount(goldFactory.create(0));
         players.add(player);
         inPenaltyBox[players.count().intValue()] = false;
         playersAnnouncer.announceLastAddedPlayer(announcePrinter);

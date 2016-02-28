@@ -12,8 +12,10 @@ public class Player {
     private GoldAmount goldAmount;
     private GoldFactory goldFactory;
 
-    Player(String name) {
+    Player(String name, Place startingPlace, GoldAmount startingAmount) {
         this.name = name;
+        this.place = startingPlace;
+        this.goldAmount = startingAmount;
         this.placeFactory = new PlaceFactory();
         this.goldFactory = new GoldFactory();
     }
