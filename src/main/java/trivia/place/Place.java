@@ -1,10 +1,17 @@
 package trivia.place;
 
+import trivia.questions.Category;
+import trivia.questions.CategoryFactory;
+
 public class Place {
     private final Integer number;
+    private final CategoryFactory categoryFactory;
+    private final Category category;
 
     Place(Integer number) {
         this.number = number;
+        this.categoryFactory = new CategoryFactory();
+        category = categoryFactory.createFrom(this);
     }
 
     @Deprecated
@@ -21,5 +28,9 @@ public class Place {
             return computedPlaceNumber - 12;
         }
         return computedPlaceNumber;
+    }
+
+    public Category getCategory() {
+        return category;
     }
 }

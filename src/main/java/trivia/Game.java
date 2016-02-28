@@ -3,42 +3,30 @@ package trivia;
 import trivia.announcement.AnnouncePrinter;
 import trivia.announcement.OutputStreamAnnouncePrinter;
 import trivia.player.*;
+import trivia.questions.*;
 
 import java.io.PrintStream;
-import java.util.LinkedList;
 
+@Deprecated
 public class Game {
     private final AnnouncePrinter announcePrinter;
     private final PlayersAnnouncer playersAnnouncer;
     private final PrintStream outputStream;
     private final InGamePlayers inGamePlayers;
     private final PenaltyBox penaltyBox;
-
-    LinkedList popQuestions = new LinkedList();
-    LinkedList scienceQuestions = new LinkedList();
-    LinkedList sportsQuestions = new LinkedList();
-    LinkedList rockQuestions = new LinkedList();
+    private final QuestionsDeck questionsDeck;
 
     int currentPlayerIndex = 0;
     private final PlayerFactory playerFactory;
 
     public Game(PrintStream outputStream) {
         this.outputStream = outputStream;
-        this.playerFactory = new PlayerFactory();
-        this.inGamePlayers = new InGamePlayers();
-        for (int i = 0; i < 50; i++) {
-            popQuestions.addLast("Pop Question " + i);
-            scienceQuestions.addLast(("Science Question " + i));
-            sportsQuestions.addLast(("Sports Question " + i));
-            rockQuestions.addLast(createRockQuestion(i));
-        }
+        playerFactory = new PlayerFactory();
+        inGamePlayers = new InGamePlayers();
         announcePrinter = new OutputStreamAnnouncePrinter(outputStream);
         playersAnnouncer = new PlayersAnnouncer(inGamePlayers);
         penaltyBox = new PenaltyBox();
-    }
-
-    public String createRockQuestion(int index) {
-        return "Rock Question " + index;
+        questionsDeck = new QuestionsDeck();
     }
 
     public boolean add(String playerName) {
@@ -62,10 +50,13 @@ public class Game {
         } else {
             getCurrentPlayer().move(roll.intValue());
             announcePlayerNewPlace();
-            announceCurrentCategory();
+            announceCategory();
             askQuestion();
         }
+    }
 
+    private void announceCategory() {
+        new CategoryAnnouncer(getCurrentCategory()).announceCategory(announcePrinter);
     }
 
     private void onEvenRollInPenaltyBox() {
@@ -76,12 +67,12 @@ public class Game {
         currentPlayerAnnouncer().announceIsGettingOutOfPenaltyBox(announcePrinter);
         getCurrentPlayer().move(roll.intValue());
         announcePlayerNewPlace();
-        announceCurrentCategory();
+        announceCategory();
         askQuestion();
     }
 
-    private void announceCurrentCategory() {
-        outputStream.println("The category is " + currentCategory());
+    private Category getCurrentCategory() {
+        return getCurrentPlayer().getPlace().getCategory();
     }
 
     private void announcePlayerNewPlace() {
@@ -108,28 +99,15 @@ public class Game {
     }
 
     private void askQuestion() {
-        if (currentCategory() == "Pop")
-            outputStream.println(popQuestions.removeFirst());
-        if (currentCategory() == "Science")
-            outputStream.println(scienceQuestions.removeFirst());
-        if (currentCategory() == "Sports")
-            outputStream.println(sportsQuestions.removeFirst());
-        if (currentCategory() == "Rock")
-            outputStream.println(rockQuestions.removeFirst());
+        CategoryDeck questionDeck = getCurrentCategoryQuestionsDeck();
+        Question card = questionDeck.getTop();
+        outputStream.println(card);
+        questionDeck.discardTop();
     }
 
-
-    private String currentCategory() {
-        if (getCurrentPlayerPlace() == 0) return "Pop";
-        if (getCurrentPlayerPlace() == 4) return "Pop";
-        if (getCurrentPlayerPlace() == 8) return "Pop";
-        if (getCurrentPlayerPlace() == 1) return "Science";
-        if (getCurrentPlayerPlace() == 5) return "Science";
-        if (getCurrentPlayerPlace() == 9) return "Science";
-        if (getCurrentPlayerPlace() == 2) return "Sports";
-        if (getCurrentPlayerPlace() == 6) return "Sports";
-        if (getCurrentPlayerPlace() == 10) return "Sports";
-        return "Rock";
+    private CategoryDeck getCurrentCategoryQuestionsDeck() {
+        Category category = getCurrentCategory();
+        return questionsDeck.getDeck(category);
     }
 
     private int getCurrentPlayerPlace() {

@@ -2,6 +2,7 @@ package trivia.announcement;
 
 import trivia.player.Player;
 import trivia.player.PlayerCount;
+import trivia.questions.Category;
 
 public class MessageFactory {
     private static Message createForText(String text) {
@@ -36,5 +37,9 @@ public class MessageFactory {
 
     public static Message createGoldAmount(Player player) {
         return createForText(player.getName() + " now has " + player.getGoldAmount() + " Gold Coins.");
+    }
+
+    public static Message createCategory(Category category) {
+        return createForText("The category is " + category);
     }
 }
