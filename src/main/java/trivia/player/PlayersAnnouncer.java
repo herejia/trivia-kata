@@ -5,19 +5,19 @@ import trivia.announcement.Message;
 import trivia.announcement.MessageFactory;
 
 public class PlayersAnnouncer {
-    private final Players players;
+    private final InGamePlayers inGamePlayers;
 
-    public PlayersAnnouncer(Players players) {
-        this.players = players;
+    public PlayersAnnouncer(InGamePlayers inGamePlayers) {
+        this.inGamePlayers = inGamePlayers;
     }
 
     public void announcePlayerCount(AnnouncePrinter announcePrinter) {
-        Message message = MessageFactory.createPlayerCount(players.count());
+        Message message = MessageFactory.createPlayerCount(inGamePlayers.count());
         announcePrinter.print(message);
     }
 
     public void announceLastAddedPlayer(AnnouncePrinter announcePrinter) {
-        Message message = MessageFactory.createPlayerAdded(players.getLastPlayer());
+        Message message = MessageFactory.createPlayerAdded(inGamePlayers.getLastPlayer());
         announcePrinter.print(message);
     }
 }

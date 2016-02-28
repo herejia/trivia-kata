@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Players {
-    private final List<Player> players;
+    private List<Player> players;
 
     public Players() {
         this.players = new ArrayList<>();
@@ -14,16 +14,11 @@ public class Players {
         players.add(player);
     }
 
-    public PlayerCount count() {
-        return new PlayerCount(players.size());
+    public int size() {
+        return players.size();
     }
 
-    public Player getPlayerByIndex(int index) {
+    public Player get(int index) {
         return players.get(index);
-    }
-
-    Player getLastPlayer() {
-        int lastIndex = players.size() - 1;
-        return players.get(lastIndex);
     }
 }

@@ -11,7 +11,7 @@ public class Game {
     private final AnnouncePrinter announcePrinter;
     private final PlayersAnnouncer playersAnnouncer;
     private final PrintStream outputStream;
-    private final Players players;
+    private final InGamePlayers inGamePlayers;
     boolean[] inPenaltyBox = new boolean[6];
 
     LinkedList popQuestions = new LinkedList();
@@ -26,7 +26,7 @@ public class Game {
     public Game(PrintStream outputStream) {
         this.outputStream = outputStream;
         this.playerFactory = new PlayerFactory();
-        this.players = new Players();
+        this.inGamePlayers = new InGamePlayers();
         for (int i = 0; i < 50; i++) {
             popQuestions.addLast("Pop Question " + i);
             scienceQuestions.addLast(("Science Question " + i));
@@ -34,7 +34,7 @@ public class Game {
             rockQuestions.addLast(createRockQuestion(i));
         }
         announcePrinter = new OutputStreamAnnouncePrinter(outputStream);
-        playersAnnouncer = new PlayersAnnouncer(players);
+        playersAnnouncer = new PlayersAnnouncer(inGamePlayers);
     }
 
     public String createRockQuestion(int index) {
@@ -43,8 +43,8 @@ public class Game {
 
     public boolean add(String playerName) {
         Player player = playerFactory.create(playerName);
-        players.add(player);
-        inPenaltyBox[players.count().intValue()] = false;
+        inGamePlayers.add(player);
+        inPenaltyBox[inGamePlayers.count().intValue()] = false;
         playersAnnouncer.announceLastAddedPlayer(announcePrinter);
         playersAnnouncer.announcePlayerCount(announcePrinter);
         return true;
@@ -97,7 +97,7 @@ public class Game {
     }
 
     private Player getCurrentPlayer() {
-        return players.getPlayerByIndex(currentPlayerIndex);
+        return inGamePlayers.getPlayerByIndex(currentPlayerIndex);
     }
 
     private PlayerAnnouncer currentPlayerAnnouncer() {
@@ -174,7 +174,7 @@ public class Game {
 
     private void nextPlayer() {
         currentPlayerIndex++;
-        if (currentPlayerIndex == players.count().intValue()) currentPlayerIndex = 0;
+        if (currentPlayerIndex == inGamePlayers.count().intValue()) currentPlayerIndex = 0;
     }
 
     private void announceCurrentPlayerGoldCoins() {
