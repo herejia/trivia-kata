@@ -50,31 +50,37 @@ public class Game {
         return true;
     }
 
-    public void roll(int roll) {
+    public void roll(Roll roll) {
         currentPlayerAnnouncer().announcePlayerAsCurrent(announcePrinter);
+
         announceRoll(roll);
-
         if (penaltyBox.detains(getCurrentPlayer())) {
-            if (roll % 2 != 0) {
-                leavingZone.leaving();
-
-                currentPlayerAnnouncer().announceIsGettingOutOfPenaltyBox(announcePrinter);
-                getCurrentPlayer().move(roll);
-
-                announcePlayerNewPlace();
-                announceCurrentCategory();
-                askQuestion();
+            if (roll.isOdd()) {
+                onOddRollInPenaltyBox(roll);
             } else {
-                currentPlayerAnnouncer().announceIsNotGettingOutOfThePenaltyBox(announcePrinter);
-                leavingZone.staying();
+                onEvenRollInPenaltyBox();
             }
         } else {
-            getCurrentPlayer().move(roll);
+            getCurrentPlayer().move(roll.intValue());
             announcePlayerNewPlace();
             announceCurrentCategory();
             askQuestion();
         }
 
+    }
+
+    private void onEvenRollInPenaltyBox() {
+        leavingZone.staying();
+        currentPlayerAnnouncer().announceIsNotGettingOutOfThePenaltyBox(announcePrinter);
+    }
+
+    private void onOddRollInPenaltyBox(Roll roll) {
+        leavingZone.leaving();
+        currentPlayerAnnouncer().announceIsGettingOutOfPenaltyBox(announcePrinter);
+        getCurrentPlayer().move(roll.intValue());
+        announcePlayerNewPlace();
+        announceCurrentCategory();
+        askQuestion();
     }
 
     private void announceCurrentCategory() {
@@ -100,7 +106,7 @@ public class Game {
         return new PlayerAnnouncer(getCurrentPlayer());
     }
 
-    private void announceRoll(int roll) {
+    private void announceRoll(Roll roll) {
         outputStream.println("They have rolled a " + roll);
     }
 
@@ -133,9 +139,9 @@ public class Game {
         return getCurrentPlayer().getPlace().intValue();
     }
 
-    public boolean wasCorrectlyAnswered(int roll) {
+    public boolean wasCorrectlyAnswered(Roll roll) {
         if (penaltyBox.detains(getCurrentPlayer())) {
-            if (leavingZone.isLeaving()) {
+            if (roll.isOdd()) {
                 announceCorrectAnswer();
                 incrementPlayerGold();
                 announceCurrentPlayerGoldCoins();
