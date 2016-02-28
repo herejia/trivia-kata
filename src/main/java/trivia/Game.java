@@ -2,6 +2,7 @@ package trivia;
 
 import trivia.announcement.AnnouncePrinter;
 import trivia.announcement.OutputStreamAnnouncePrinter;
+import trivia.place.PlaceFactory;
 import trivia.player.*;
 
 import java.io.PrintStream;
@@ -12,7 +13,6 @@ public class Game {
     private final PlayersAnnouncer playersAnnouncer;
     private final PrintStream outputStream;
     private final Players players;
-    int[] places = new int[6];
     int[] purses = new int[6];
     boolean[] inPenaltyBox = new boolean[6];
 
@@ -23,10 +23,13 @@ public class Game {
 
     int currentPlayerIndex = 0;
     boolean isGettingOutOfPenaltyBox;
-    private PlayerFactory playerFactory;
+    private final PlayerFactory playerFactory;
+    private final PlaceFactory placeFactory;
 
     public Game(PrintStream outputStream) {
         this.outputStream = outputStream;
+        this.playerFactory = new PlayerFactory();
+        this.placeFactory = new PlaceFactory();
         this.players = new Players();
         for (int i = 0; i < 50; i++) {
             popQuestions.addLast("Pop Question " + i);
@@ -43,10 +46,9 @@ public class Game {
     }
 
     public boolean add(String playerName) {
-        playerFactory = new PlayerFactory();
         Player player = playerFactory.create(playerName);
+        player.setPlace(placeFactory.createStartingPlace());
         players.add(player);
-        places[players.count().intValue()] = 0;
         purses[players.count().intValue()] = 0;
         inPenaltyBox[players.count().intValue()] = false;
 
@@ -64,7 +66,7 @@ public class Game {
                 setPlayerOutOfPenaltyBox();
 
                 currentPlayerAnnouncer().announceIsGettingOutOfPenaltyBox(announcePrinter);
-                movePlayer(roll);
+                getCurrentPlayer().move(roll);
 
                 announcePlayerNewPlace();
                 announceCurrentCategory();
@@ -74,7 +76,7 @@ public class Game {
                 setPlayerGettingOutOfPenaltyBox();
             }
         } else {
-            movePlayer(roll);
+            getCurrentPlayer().move(roll);
             announcePlayerNewPlace();
             announceCurrentCategory();
             askQuestion();
@@ -93,7 +95,7 @@ public class Game {
     private void announcePlayerNewPlace() {
         outputStream.println(getCurrentPlayerName()
                 + "'s new location is "
-                + places[currentPlayerIndex]);
+                + getCurrentPlayerPlace());
     }
 
     private String getCurrentPlayerName() {
@@ -103,11 +105,6 @@ public class Game {
 
     private Player getCurrentPlayer() {
         return players.getPlayerByIndex(currentPlayerIndex);
-    }
-
-    private void movePlayer(int steps) {
-        places[currentPlayerIndex] = places[currentPlayerIndex] + steps;
-        if (places[currentPlayerIndex] > 11) places[currentPlayerIndex] = places[currentPlayerIndex] - 12;
     }
 
     private PlayerAnnouncer currentPlayerAnnouncer() {
@@ -139,16 +136,20 @@ public class Game {
 
 
     private String currentCategory() {
-        if (places[currentPlayerIndex] == 0) return "Pop";
-        if (places[currentPlayerIndex] == 4) return "Pop";
-        if (places[currentPlayerIndex] == 8) return "Pop";
-        if (places[currentPlayerIndex] == 1) return "Science";
-        if (places[currentPlayerIndex] == 5) return "Science";
-        if (places[currentPlayerIndex] == 9) return "Science";
-        if (places[currentPlayerIndex] == 2) return "Sports";
-        if (places[currentPlayerIndex] == 6) return "Sports";
-        if (places[currentPlayerIndex] == 10) return "Sports";
+        if (getCurrentPlayerPlace() == 0) return "Pop";
+        if (getCurrentPlayerPlace() == 4) return "Pop";
+        if (getCurrentPlayerPlace() == 8) return "Pop";
+        if (getCurrentPlayerPlace() == 1) return "Science";
+        if (getCurrentPlayerPlace() == 5) return "Science";
+        if (getCurrentPlayerPlace() == 9) return "Science";
+        if (getCurrentPlayerPlace() == 2) return "Sports";
+        if (getCurrentPlayerPlace() == 6) return "Sports";
+        if (getCurrentPlayerPlace() == 10) return "Sports";
         return "Rock";
+    }
+
+    private int getCurrentPlayerPlace() {
+        return getCurrentPlayer().getPlace().intValue();
     }
 
     public boolean wasCorrectlyAnswered() {
