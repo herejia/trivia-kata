@@ -22,7 +22,7 @@ public final class Roll {
         return String.valueOf(roll);
     }
 
-    public boolean isOdd() {
+    private boolean isOdd() {
         return roll % 2 != 0;
     }
 
@@ -31,11 +31,19 @@ public final class Roll {
         return roll;
     }
 
-    public void detainedPlayerMoves(Player detainedPlayer, Game game, PenaltyBox penaltyBox) {
+    void detainedPlayerMoves(Player detainedPlayer, Game game, PenaltyBox penaltyBox) {
         if (isOdd()) {
             penaltyBox.detainedPlayerRolledOdd(detainedPlayer, game, this);
         } else {
             penaltyBox.detainedPlayerRolledEven(detainedPlayer, game);
+        }
+    }
+
+    boolean detainedPlayerAnswersCorrectly(Game game) {
+        if (isOdd()) {
+            return game.detainedPlayerAnswersCorrectlyAndRolledOdd();
+        } else {
+            return game.detainedPlayerAnswersCorrectlyButRolledEven();
         }
     }
 }

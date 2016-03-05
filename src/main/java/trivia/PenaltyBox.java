@@ -10,7 +10,7 @@ final class PenaltyBox {
         players = new Players();
     }
 
-    boolean detains(Player player) {
+    private boolean detains(Player player) {
         return players.contains(player);
     }
 
@@ -32,5 +32,13 @@ final class PenaltyBox {
 
     void detainedPlayerRolledEven(Player detainedPlayer, Game game) {
         game.playerStaysIn(detainedPlayer);
+    }
+
+    boolean playerAnswersCorrectly(Game game, Player answeringPlayer, Roll roll) {
+        if (detains(answeringPlayer)) {
+            return game.detainedPlayerAnswersCorrectly(roll);
+        } else {
+            return game.freePlayerAnswersCorrectly();
+        }
     }
 }

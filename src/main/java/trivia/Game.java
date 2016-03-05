@@ -74,26 +74,34 @@ public class Game {
     }
 
     public boolean wasCorrectlyAnswered(Roll roll) {
-        if (penaltyBox.detains(getCurrentPlayer())) {
-            if (roll.isOdd()) {
-                announceCorrectAnswer();
-                incrementPlayerGold();
-                announceCurrentPlayerGoldCoins();
-                boolean winner = didCurrentPlayerWin();
-                nextPlayer();
-                return winner;
-            } else {
-                nextPlayer();
-                return true;
-            }
-        } else {
-            announceAnswerWasCorrent();
-            incrementPlayerGold();
-            announceCurrentPlayerGoldCoins();
-            boolean winner = didCurrentPlayerWin();
-            nextPlayer();
-            return winner;
-        }
+        return penaltyBox.playerAnswersCorrectly(this, getCurrentPlayer(), roll);
+    }
+
+    public boolean detainedPlayerAnswersCorrectly(Roll roll) {
+        return roll.detainedPlayerAnswersCorrectly(this);
+    }
+
+    boolean detainedPlayerAnswersCorrectlyButRolledEven() {
+        nextPlayer();
+        return true;
+    }
+
+    boolean detainedPlayerAnswersCorrectlyAndRolledOdd() {
+        announceCorrectAnswer();
+        incrementPlayerGold();
+        announceCurrentPlayerGoldCoins();
+        boolean winner = didCurrentPlayerWin();
+        nextPlayer();
+        return winner;
+    }
+
+    public boolean freePlayerAnswersCorrectly() {
+        announceAnswerWasCorrent();
+        incrementPlayerGold();
+        announceCurrentPlayerGoldCoins();
+        boolean winner = didCurrentPlayerWin();
+        nextPlayer();
+        return winner;
     }
 
     private void announceAnswerWasCorrent() {
