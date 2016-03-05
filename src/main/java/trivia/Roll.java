@@ -1,8 +1,10 @@
 package trivia;
 
+import trivia.move.OnLeavePlayerMove;
+
 import java.util.Random;
 
-final class Roll {
+public final class Roll {
 
     private final Random random;
     private int roll;
@@ -27,5 +29,13 @@ final class Roll {
     @Deprecated
     public int intValue() {
         return roll;
+    }
+
+    public void detainedPlayerMoves(OnLeavePlayerMove playerMove) {
+        if (isOdd()) {
+            playerMove.move(this);
+        } else {
+            playerMove.stayIn();
+        }
     }
 }

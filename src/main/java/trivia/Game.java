@@ -2,6 +2,9 @@ package trivia;
 
 import trivia.announcement.AnnouncePrinter;
 import trivia.announcement.OutputStreamAnnouncePrinter;
+import trivia.move.DetainedPlayerMove;
+import trivia.move.FreePlayerMove;
+import trivia.move.OnLeavePlayerMove;
 import trivia.player.*;
 import trivia.questions.*;
 
@@ -33,32 +36,33 @@ public class Game {
         currentPlayerAnnouncer().announcePlayerAsCurrent(announcePrinter);
 
         announceRoll(roll);
-        if (penaltyBox.detains(getCurrentPlayer())) {
-            if (roll.isOdd()) {
-                onOddRollInPenaltyBox(roll);
-            } else {
-                onEvenRollInPenaltyBox();
-            }
+        Player currentPlayer = getCurrentPlayer();
+        penaltyBox.playerMoves(roll, currentPlayer, new DetainedPlayerMove(this), new FreePlayerMove(this));
+    }
+
+    private void freePlayerMove(Roll roll) {
+        getCurrentPlayer().move(roll.intValue());
+        announceCategory();
+        askQuestion();
+    }
+
+    public void dicesHaveBeenRolled(Roll roll) {
+        getCurrentPlayer().move(roll.intValue());
+        announceCategory();
+        askQuestion();
+    }
+
+    private void detainedPlayerMove(Roll roll) {
+        if (roll.isOdd()) {
+            currentPlayerAnnouncer().announceIsGettingOutOfPenaltyBox(announcePrinter);
+            freePlayerMove(roll);
         } else {
-            getCurrentPlayer().move(roll.intValue());
-            announceCategory();
-            askQuestion();
+            currentPlayerAnnouncer().announceIsNotGettingOutOfThePenaltyBox(announcePrinter);
         }
     }
 
     private void announceCategory() {
         new CategoryAnnouncer(getCurrentCategory()).announceCategory(announcePrinter);
-    }
-
-    private void onEvenRollInPenaltyBox() {
-        currentPlayerAnnouncer().announceIsNotGettingOutOfThePenaltyBox(announcePrinter);
-    }
-
-    private void onOddRollInPenaltyBox(Roll roll) {
-        currentPlayerAnnouncer().announceIsGettingOutOfPenaltyBox(announcePrinter);
-        getCurrentPlayer().move(roll.intValue());
-        announceCategory();
-        askQuestion();
     }
 
     private Category getCurrentCategory() {
@@ -87,10 +91,6 @@ public class Game {
     private CategoryDeck getCurrentCategoryQuestionsDeck() {
         Category category = getCurrentCategory();
         return questionsDeck.getDeck(category);
-    }
-
-    private int getCurrentPlayerPlace() {
-        return getCurrentPlayer().getPlace().intValue();
     }
 
     public boolean wasCorrectlyAnswered(Roll roll) {
@@ -153,5 +153,13 @@ public class Game {
 
     private boolean didCurrentPlayerWin() {
         return !getCurrentPlayer().hasWinningGoldAmount();
+    }
+
+    public void onLeavePlayerRolled() {
+        currentPlayerAnnouncer().announceIsGettingOutOfPenaltyBox(announcePrinter);
+    }
+
+    public void playerStaysIn() {
+        currentPlayerAnnouncer().announceIsNotGettingOutOfThePenaltyBox(announcePrinter);
     }
 }
