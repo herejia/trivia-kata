@@ -42,4 +42,8 @@ public class MessageFactory {
     public static Message createCategory(Category category) {
         return createForText("The category is " + category);
     }
+
+    public static Message createNewPlace(Player player) {
+        return createForText(player.getName() + "'s new location is " + player.getPlace().intValue());
+    }
 }

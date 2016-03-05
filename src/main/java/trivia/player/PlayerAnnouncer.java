@@ -35,4 +35,9 @@ public class PlayerAnnouncer {
         Message message = MessageFactory.createGoldAmount(currentPlayer);
         announcePrinter.print(message);
     }
+
+    public void announceNewPlace(AnnouncePrinter announcePrinter) {
+        Message message = MessageFactory.createNewPlace(currentPlayer);
+        announcePrinter.print(message);
+    }
 }

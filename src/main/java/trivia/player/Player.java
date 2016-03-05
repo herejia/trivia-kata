@@ -1,5 +1,6 @@
 package trivia.player;
 
+import trivia.announcement.AnnouncePrinter;
 import trivia.gold.GoldAmount;
 import trivia.gold.GoldFactory;
 import trivia.place.Place;
@@ -8,16 +9,20 @@ import trivia.place.PlaceFactory;
 public class Player {
     private final String name;
     private Place place;
-    private PlaceFactory placeFactory;
+    private final PlaceFactory placeFactory;
     private GoldAmount goldAmount;
-    private GoldFactory goldFactory;
+    private final GoldFactory goldFactory;
+    private final PlayerAnnouncer playerAnnouncer;
+    private final AnnouncePrinter announcePrinter;
 
-    Player(String name, Place startingPlace, GoldAmount startingAmount) {
+    Player(String name, Place startingPlace, GoldAmount startingAmount, AnnouncePrinter announcePrinter) {
         this.name = name;
         this.place = startingPlace;
         this.goldAmount = startingAmount;
+        this.announcePrinter = announcePrinter;
         this.placeFactory = new PlaceFactory();
         this.goldFactory = new GoldFactory();
+        playerAnnouncer = new PlayerAnnouncer(this);
     }
 
     public String getName() {
@@ -34,6 +39,11 @@ public class Player {
 
     public void move(int steps) {
         this.place = placeFactory.create(place, steps);
+        announcePlayerNewPlace();
+    }
+
+    private void announcePlayerNewPlace() {
+        this.playerAnnouncer.announceNewPlace(announcePrinter);
     }
 
     public void setGoldAmount(GoldAmount goldAmount) {

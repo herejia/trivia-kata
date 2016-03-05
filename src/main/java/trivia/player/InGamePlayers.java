@@ -16,7 +16,7 @@ public class InGamePlayers {
     }
 
     public void newPlayer(String playerName) {
-        Player player = playerFactory.create(playerName);
+        Player player = playerFactory.create(playerName, announcePrinter);
         players.add(player);
         playersAnnouncer.announceLastAddedPlayer(announcePrinter);
         playersAnnouncer.announcePlayerCount(announcePrinter);

@@ -41,7 +41,6 @@ public class Game {
             }
         } else {
             getCurrentPlayer().move(roll.intValue());
-            announcePlayerNewPlace();
             announceCategory();
             askQuestion();
         }
@@ -58,24 +57,12 @@ public class Game {
     private void onOddRollInPenaltyBox(Roll roll) {
         currentPlayerAnnouncer().announceIsGettingOutOfPenaltyBox(announcePrinter);
         getCurrentPlayer().move(roll.intValue());
-        announcePlayerNewPlace();
         announceCategory();
         askQuestion();
     }
 
     private Category getCurrentCategory() {
         return getCurrentPlayer().getPlace().getCategory();
-    }
-
-    private void announcePlayerNewPlace() {
-        outputStream.println(getCurrentPlayerName()
-                + "'s new location is "
-                + getCurrentPlayerPlace());
-    }
-
-    private String getCurrentPlayerName() {
-        Player currentPlayer = getCurrentPlayer();
-        return currentPlayer.getName();
     }
 
     private Player getCurrentPlayer() {
