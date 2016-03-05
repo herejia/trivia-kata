@@ -36,6 +36,7 @@ public class GameRunner {
             } else {
                 aGame.wrongAnswer();
             }
+            aGame.turnIsOver();
         });
     }
 }

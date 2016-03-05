@@ -1,5 +1,6 @@
 package trivia.player;
 
+import trivia.Game;
 import trivia.announcement.AnnouncePrinter;
 
 public class InGamePlayers {
@@ -7,12 +8,16 @@ public class InGamePlayers {
     private final PlayerFactory playerFactory;
     private final PlayersAnnouncer playersAnnouncer;
     private final AnnouncePrinter announcePrinter;
+    private int activePlayerIndex;
+    private Game game;
 
-    public InGamePlayers(AnnouncePrinter announcePrinter) {
+    public InGamePlayers(Game game, AnnouncePrinter announcePrinter) {
+        this.game = game;
         this.announcePrinter = announcePrinter;
         players = new Players();
         playerFactory = new PlayerFactory();
         playersAnnouncer = new PlayersAnnouncer(this);
+        activePlayerIndex = 0;
     }
 
     public void newPlayer(String playerName) {
@@ -20,14 +25,23 @@ public class InGamePlayers {
         players.add(player);
         playersAnnouncer.announceLastAddedPlayer(announcePrinter);
         playersAnnouncer.announcePlayerCount(announcePrinter);
+        game.activePlayerIs(getActivePlayer());
     }
 
-    public PlayerCount count() {
+    public void nextPlayer() {
+        activePlayerIndex++;
+        if (activePlayerIndex == players.size()) {
+            activePlayerIndex = 0;
+        }
+        game.activePlayerIs(getActivePlayer());
+    }
+
+    private Player getActivePlayer() {
+        return players.get(activePlayerIndex);
+    }
+
+    PlayerCount count() {
         return new PlayerCount(players.size());
-    }
-
-    public Player getPlayerByIndex(int index) {
-        return players.get(index);
     }
 
     Player getLastPlayer() {

@@ -14,14 +14,14 @@ public class Game {
     private final InGamePlayers inGamePlayers;
     private final PenaltyBox penaltyBox;
     private final QuestionsDeck questionsDeck;
-    int currentPlayerIndex = 0;
     private VerdictListener verdictListener;
+    private Player activePlayer;
 
     public Game(PrintStream outputStream, VerdictListener verdictListener) {
         this.outputStream = outputStream;
         this.verdictListener = verdictListener;
         announcePrinter = new OutputStreamAnnouncePrinter(outputStream);
-        inGamePlayers = new InGamePlayers(announcePrinter);
+        inGamePlayers = new InGamePlayers(this, announcePrinter);
         penaltyBox = new PenaltyBox();
         questionsDeck = new QuestionsDeck();
     }
@@ -33,7 +33,7 @@ public class Game {
     void roll(Roll roll) {
         currentPlayerAnnouncer().announcePlayerAsCurrent(announcePrinter);
         announceRoll(roll);
-        penaltyBox.playerMoves(roll, getCurrentPlayer(), this);
+        penaltyBox.playerMoves(roll, activePlayer, this);
     }
 
     void freePlayerMoves(Player byPlayer, Roll roll) {
@@ -47,15 +47,11 @@ public class Game {
     }
 
     private Category getCurrentCategory() {
-        return getCurrentPlayer().getPlace().getCategory();
-    }
-
-    private Player getCurrentPlayer() {
-        return inGamePlayers.getPlayerByIndex(currentPlayerIndex);
+        return activePlayer.getPlace().getCategory();
     }
 
     private PlayerAnnouncer currentPlayerAnnouncer() {
-        return new PlayerAnnouncer(getCurrentPlayer());
+        return new PlayerAnnouncer(activePlayer);
     }
 
     private void announceRoll(Roll roll) {
@@ -75,7 +71,7 @@ public class Game {
     }
 
     void wasCorrectlyAnswered(Roll roll) {
-        penaltyBox.playerAnswersCorrectly(this, getCurrentPlayer(), roll);
+        penaltyBox.playerAnswersCorrectly(this, activePlayer, roll);
     }
 
     void detainedPlayerAnswersCorrectly(Roll roll) {
@@ -83,7 +79,6 @@ public class Game {
     }
 
     boolean detainedPlayerAnswersCorrectlyButRolledEven() {
-        nextPlayer();
         return true;
     }
 
@@ -95,17 +90,11 @@ public class Game {
         announceCorrectAnswer();
         incrementPlayerGold();
         announceCurrentPlayerGoldCoins();
-        getCurrentPlayer().doesPlayerHaveWinningAmount(this);
-        nextPlayer();
+        activePlayer.doesPlayerHaveWinningAmount(this);
     }
 
     private void announceCorrectAnswer() {
         outputStream.println("Answer was correct!!!!");
-    }
-
-    private void nextPlayer() {
-        currentPlayerIndex++;
-        if (currentPlayerIndex == inGamePlayers.count().intValue()) currentPlayerIndex = 0;
     }
 
     private void announceCurrentPlayerGoldCoins() {
@@ -113,15 +102,13 @@ public class Game {
     }
 
     private void incrementPlayerGold() {
-        getCurrentPlayer().incrementGoldAmount();
+        activePlayer.incrementGoldAmount();
     }
 
     public void wrongAnswer() {
         announceWrongAnswer();
         currentPlayerAnnouncer().announceSentInPenaltyBox(announcePrinter);
-        penaltyBox.detain(getCurrentPlayer());
-
-        nextPlayer();
+        penaltyBox.detain(activePlayer);
     }
 
     private void announceWrongAnswer() {
@@ -141,5 +128,13 @@ public class Game {
 
     public void playerHasWinningGoldAmount(Player player) {
         verdictListener.hasWon(player);
+    }
+
+    void turnIsOver() {
+        inGamePlayers.nextPlayer();
+    }
+
+    public void activePlayerIs(Player activePlayer) {
+        this.activePlayer = activePlayer;
     }
 }
