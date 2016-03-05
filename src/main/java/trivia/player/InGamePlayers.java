@@ -1,14 +1,25 @@
 package trivia.player;
 
+import trivia.announcement.AnnouncePrinter;
+
 public class InGamePlayers {
     private final Players players;
+    private final PlayerFactory playerFactory;
+    private final PlayersAnnouncer playersAnnouncer;
+    private final AnnouncePrinter announcePrinter;
 
-    public InGamePlayers() {
-        this.players = new Players();
+    public InGamePlayers(AnnouncePrinter announcePrinter) {
+        this.announcePrinter = announcePrinter;
+        players = new Players();
+        playerFactory = new PlayerFactory();
+        playersAnnouncer = new PlayersAnnouncer(this);
     }
 
-    public void add(Player player) {
+    public void newPlayer(String playerName) {
+        Player player = playerFactory.create(playerName);
         players.add(player);
+        playersAnnouncer.announceLastAddedPlayer(announcePrinter);
+        playersAnnouncer.announcePlayerCount(announcePrinter);
     }
 
     public PlayerCount count() {

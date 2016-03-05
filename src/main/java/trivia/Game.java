@@ -10,31 +10,23 @@ import java.io.PrintStream;
 @Deprecated
 public class Game {
     private final AnnouncePrinter announcePrinter;
-    private final PlayersAnnouncer playersAnnouncer;
     private final PrintStream outputStream;
     private final InGamePlayers inGamePlayers;
     private final PenaltyBox penaltyBox;
     private final QuestionsDeck questionsDeck;
 
     int currentPlayerIndex = 0;
-    private final PlayerFactory playerFactory;
 
     public Game(PrintStream outputStream) {
         this.outputStream = outputStream;
-        playerFactory = new PlayerFactory();
-        inGamePlayers = new InGamePlayers();
         announcePrinter = new OutputStreamAnnouncePrinter(outputStream);
-        playersAnnouncer = new PlayersAnnouncer(inGamePlayers);
+        inGamePlayers = new InGamePlayers(announcePrinter);
         penaltyBox = new PenaltyBox();
         questionsDeck = new QuestionsDeck();
     }
 
-    public boolean add(String playerName) {
-        Player player = playerFactory.create(playerName);
-        inGamePlayers.add(player);
-        playersAnnouncer.announceLastAddedPlayer(announcePrinter);
-        playersAnnouncer.announcePlayerCount(announcePrinter);
-        return true;
+    public void add(String playerName) {
+        inGamePlayers.newPlayer(playerName);
     }
 
     public void roll(Roll roll) {
