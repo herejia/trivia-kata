@@ -1,5 +1,7 @@
 package trivia;
 
+import trivia.flow.TurnCycler;
+
 import java.io.PrintStream;
 import java.util.Random;
 
@@ -7,7 +9,6 @@ import java.util.Random;
 public class GameRunner {
 
     public static final int SEED = 42;
-    private static boolean notAWinner;
     private final PrintStream printStream;
 
     public GameRunner(PrintStream printStream) {
@@ -15,7 +16,8 @@ public class GameRunner {
     }
 
     public void run() {
-        Game aGame = new Game(printStream);
+        TurnCycler turnCycler = new TurnCycler();
+        Game aGame = new Game(printStream, turnCycler);
 
         aGame.add("Chet");
         aGame.add("Pat");
@@ -23,21 +25,17 @@ public class GameRunner {
 
         Random randomizer = new Random(SEED);
 
-        do {
-
-            Roll roll1 = new Roll(randomizer);
-            roll1.roll();
-            aGame.roll(roll1);
+        Roll roll = new Roll(randomizer);
+        turnCycler.untilAPlayerWins(() -> {
+            roll.roll();
+            aGame.roll(roll);
 
             boolean isAnswerCorrect = randomizer.nextInt(9) != 7;
             if (isAnswerCorrect) {
-                notAWinner = aGame.wasCorrectlyAnswered(roll1);
+                aGame.wasCorrectlyAnswered(roll);
             } else {
-                notAWinner = aGame.wrongAnswer();
+                aGame.wrongAnswer();
             }
-
-
-        } while (notAWinner);
-
+        });
     }
 }

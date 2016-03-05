@@ -39,11 +39,11 @@ public final class Roll {
         }
     }
 
-    boolean detainedPlayerAnswersCorrectly(Game game) {
+    void detainedPlayerAnswersCorrectly(Game game) {
         if (isOdd()) {
-            return game.detainedPlayerAnswersCorrectlyAndRolledOdd();
+            game.detainedPlayerAnswersCorrectlyAndRolledOdd();
         } else {
-            return game.detainedPlayerAnswersCorrectlyButRolledEven();
+            game.detainedPlayerAnswersCorrectlyButRolledEven();
         }
     }
 }

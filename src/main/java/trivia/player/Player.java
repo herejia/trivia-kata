@@ -1,5 +1,6 @@
 package trivia.player;
 
+import trivia.Game;
 import trivia.announcement.AnnouncePrinter;
 import trivia.gold.GoldAmount;
 import trivia.gold.GoldFactory;
@@ -62,5 +63,11 @@ public class Player {
 
     public GoldAmount getGoldAmount() {
         return goldAmount;
+    }
+
+    public void doesPlayerHaveWinningAmount(Game game) {
+        if (hasWinningGoldAmount()) {
+            game.playerHasWinningGoldAmount(this);
+        }
     }
 }

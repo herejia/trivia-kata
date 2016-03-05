@@ -34,11 +34,11 @@ final class PenaltyBox {
         game.playerStaysIn(detainedPlayer);
     }
 
-    boolean playerAnswersCorrectly(Game game, Player answeringPlayer, Roll roll) {
+    void playerAnswersCorrectly(Game game, Player answeringPlayer, Roll roll) {
         if (detains(answeringPlayer)) {
-            return game.detainedPlayerAnswersCorrectly(roll);
+            game.detainedPlayerAnswersCorrectly(roll);
         } else {
-            return game.freePlayerAnswersCorrectly();
+            game.freePlayerAnswersCorrectly();
         }
     }
 }
