@@ -1,6 +1,6 @@
 package trivia;
 
-import trivia.move.OnLeavePlayerMove;
+import trivia.player.Player;
 
 import java.util.Random;
 
@@ -31,11 +31,11 @@ public final class Roll {
         return roll;
     }
 
-    public void detainedPlayerMoves(OnLeavePlayerMove playerMove) {
+    public void detainedPlayerMoves(Player detainedPlayer, Game game, PenaltyBox penaltyBox) {
         if (isOdd()) {
-            playerMove.move(this);
+            penaltyBox.detainedPlayerRolledOdd(detainedPlayer, game, this);
         } else {
-            playerMove.stayIn();
+            penaltyBox.detainedPlayerRolledEven(detainedPlayer, game);
         }
     }
 }

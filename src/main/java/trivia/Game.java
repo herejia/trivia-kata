@@ -2,9 +2,6 @@ package trivia;
 
 import trivia.announcement.AnnouncePrinter;
 import trivia.announcement.OutputStreamAnnouncePrinter;
-import trivia.move.DetainedPlayerMove;
-import trivia.move.FreePlayerMove;
-import trivia.move.OnLeavePlayerMove;
 import trivia.player.*;
 import trivia.questions.*;
 
@@ -28,37 +25,20 @@ public class Game {
         questionsDeck = new QuestionsDeck();
     }
 
-    public void add(String playerName) {
+    void add(String playerName) {
         inGamePlayers.newPlayer(playerName);
     }
 
-    public void roll(Roll roll) {
+    void roll(Roll roll) {
         currentPlayerAnnouncer().announcePlayerAsCurrent(announcePrinter);
-
         announceRoll(roll);
-        Player currentPlayer = getCurrentPlayer();
-        penaltyBox.playerMoves(roll, currentPlayer, new DetainedPlayerMove(this), new FreePlayerMove(this));
+        penaltyBox.playerMoves(roll, getCurrentPlayer(), this);
     }
 
-    private void freePlayerMove(Roll roll) {
-        getCurrentPlayer().move(roll.intValue());
+    void freePlayerMoves(Player byPlayer, Roll roll) {
+        byPlayer.move(roll.intValue());
         announceCategory();
         askQuestion();
-    }
-
-    public void dicesHaveBeenRolled(Roll roll) {
-        getCurrentPlayer().move(roll.intValue());
-        announceCategory();
-        askQuestion();
-    }
-
-    private void detainedPlayerMove(Roll roll) {
-        if (roll.isOdd()) {
-            currentPlayerAnnouncer().announceIsGettingOutOfPenaltyBox(announcePrinter);
-            freePlayerMove(roll);
-        } else {
-            currentPlayerAnnouncer().announceIsNotGettingOutOfThePenaltyBox(announcePrinter);
-        }
     }
 
     private void announceCategory() {
@@ -155,11 +135,14 @@ public class Game {
         return !getCurrentPlayer().hasWinningGoldAmount();
     }
 
-    public void onLeavePlayerRolled() {
-        currentPlayerAnnouncer().announceIsGettingOutOfPenaltyBox(announcePrinter);
+    void playerLeavesPenaltyBox(Player detainedPlayer, Roll roll) {
+        PlayerAnnouncer playerAnnouncer = new PlayerAnnouncer(detainedPlayer);
+        playerAnnouncer.announceIsGettingOutOfPenaltyBox(announcePrinter);
+        freePlayerMoves(detainedPlayer, roll);
     }
 
-    public void playerStaysIn() {
-        currentPlayerAnnouncer().announceIsNotGettingOutOfThePenaltyBox(announcePrinter);
+    void playerStaysIn(Player detainedPlayer) {
+        PlayerAnnouncer playerAnnouncer = new PlayerAnnouncer(detainedPlayer);
+        playerAnnouncer.announceIsNotGettingOutOfThePenaltyBox(announcePrinter);
     }
 }

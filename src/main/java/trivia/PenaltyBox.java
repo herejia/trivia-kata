@@ -1,8 +1,5 @@
 package trivia;
 
-import trivia.move.DetainedPlayerMove;
-import trivia.move.FreePlayerMove;
-import trivia.move.PlayerMove;
 import trivia.player.Player;
 import trivia.player.Players;
 
@@ -21,13 +18,19 @@ final class PenaltyBox {
         players.add(currentPlayer);
     }
 
-    public void playerMoves(Roll roll, Player player,
-                            DetainedPlayerMove detainedPlayerMove,
-                            FreePlayerMove freePlayerMove) {
-        if (detains(player)) {
-            detainedPlayerMove.move(roll);
+    void playerMoves(Roll roll, Player movingPlayer, Game game) {
+        if (detains(movingPlayer)) {
+            roll.detainedPlayerMoves(movingPlayer, game, this);
         } else {
-            freePlayerMove.move(roll);
+            game.freePlayerMoves(movingPlayer, roll);
         }
+    }
+
+    void detainedPlayerRolledOdd(Player player, Game game, Roll roll) {
+        game.playerLeavesPenaltyBox(player, roll);
+    }
+
+    void detainedPlayerRolledEven(Player detainedPlayer, Game game) {
+        game.playerStaysIn(detainedPlayer);
     }
 }
