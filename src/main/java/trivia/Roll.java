@@ -31,7 +31,7 @@ public final class Roll {
         return roll;
     }
 
-    void detainedPlayerMoves(Player detainedPlayer, Game game, PenaltyBox penaltyBox) {
+    void detainedPlayerMoves(Player detainedPlayer, GameController game, PenaltyBox penaltyBox) {
         if (isOdd()) {
             penaltyBox.detainedPlayerRolledOdd(detainedPlayer, game, this);
         } else {

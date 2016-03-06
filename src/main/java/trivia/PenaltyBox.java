@@ -18,7 +18,7 @@ final class PenaltyBox {
         players.add(currentPlayer);
     }
 
-    void playerMoves(Roll roll, Player movingPlayer, Game game) {
+    void playerMoves(Roll roll, Player movingPlayer, GameController game) {
         if (detains(movingPlayer)) {
             roll.detainedPlayerMoves(movingPlayer, game, this);
         } else {
@@ -26,12 +26,12 @@ final class PenaltyBox {
         }
     }
 
-    void detainedPlayerRolledOdd(Player player, Game game, Roll roll) {
-        game.playerLeavesPenaltyBox(player, roll);
+    void detainedPlayerRolledOdd(Player player, GameController gameController, Roll roll) {
+        gameController.playerLeavesPenaltyBox(player, roll);
     }
 
-    void detainedPlayerRolledEven(Player detainedPlayer, Game game) {
-        game.playerStaysIn(detainedPlayer);
+    void detainedPlayerRolledEven(Player detainedPlayer, GameController gameController) {
+        gameController.playerStaysInPenaltyBox(detainedPlayer);
     }
 
     void playerAnswersCorrectly(Game game, Player answeringPlayer, Roll roll) {
