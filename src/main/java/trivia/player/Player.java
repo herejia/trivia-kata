@@ -70,4 +70,24 @@ public class Player {
             game.playerHasWinningGoldAmount(this);
         }
     }
+
+    public void announceSentInPenaltyBox(AnnouncePrinter announcePrinter) {
+        playerAnnouncer.announceSentInPenaltyBox(announcePrinter);
+    }
+
+    public void announceIsCurrent(AnnouncePrinter announcePrinter) {
+        playerAnnouncer.announcePlayerAsCurrent(announcePrinter);
+    }
+
+    public void announceIsGettingOutOfPenaltyBox(AnnouncePrinter announcePrinter) {
+        playerAnnouncer.announceIsGettingOutOfPenaltyBox(announcePrinter);
+    }
+
+    public void announceIsNotGettingOutOfThePenaltyBox(AnnouncePrinter announcePrinter) {
+        playerAnnouncer.announceIsNotGettingOutOfThePenaltyBox(announcePrinter);
+    }
+
+    public void announceGoldAmount(AnnouncePrinter announcePrinter) {
+        playerAnnouncer.announceGoldAmount(announcePrinter);
+    }
 }

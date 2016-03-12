@@ -1,5 +1,6 @@
 package trivia;
 
+import trivia.announcement.AnnouncePrinter;
 import trivia.player.Player;
 import trivia.player.Players;
 
@@ -14,8 +15,9 @@ final class PenaltyBox {
         return players.contains(player);
     }
 
-    void detain(Player currentPlayer) {
-        players.add(currentPlayer);
+    void detain(Player playerToDetain, AnnouncePrinter announcePrinter) {
+        playerToDetain.announceSentInPenaltyBox(announcePrinter);
+        players.add(playerToDetain);
     }
 
     void playerMoves(Roll roll, Player movingPlayer, GameController game) {

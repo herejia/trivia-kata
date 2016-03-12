@@ -5,8 +5,10 @@ import trivia.announcement.OutputStreamAnnouncePrinter;
 import trivia.flow.VerdictListener;
 import trivia.player.InGamePlayers;
 import trivia.player.Player;
-import trivia.player.PlayerAnnouncer;
-import trivia.questions.*;
+import trivia.questions.Category;
+import trivia.questions.CategoryDeck;
+import trivia.questions.Question;
+import trivia.questions.QuestionsDeck;
 
 import java.io.PrintStream;
 
@@ -31,21 +33,19 @@ public class Game implements GameController {
     @Override
     public void freePlayerMoves(Player byPlayer, Roll roll) {
         byPlayer.move(roll.intValue());
-        announceCategory();
+        getCurrentCategory().announceCategory(announcePrinter);
         askQuestion();
     }
 
     @Override
     public void playerLeavesPenaltyBox(Player detainedPlayer, Roll roll) {
-        PlayerAnnouncer playerAnnouncer = new PlayerAnnouncer(detainedPlayer);
-        playerAnnouncer.announceIsGettingOutOfPenaltyBox(announcePrinter);
+        detainedPlayer.announceIsGettingOutOfPenaltyBox(announcePrinter);
         freePlayerMoves(detainedPlayer, roll);
     }
 
     @Override
     public void playerStaysInPenaltyBox(Player detainedPlayer) {
-        PlayerAnnouncer playerAnnouncer = new PlayerAnnouncer(detainedPlayer);
-        playerAnnouncer.announceIsNotGettingOutOfThePenaltyBox(announcePrinter);
+        detainedPlayer.announceIsNotGettingOutOfThePenaltyBox(announcePrinter);
     }
 
     public void activePlayerIs(Player activePlayer) {
@@ -61,7 +61,7 @@ public class Game implements GameController {
     }
 
     void roll(Roll roll) {
-        currentPlayerAnnouncer().announcePlayerAsCurrent(announcePrinter);
+        activePlayer.announceIsCurrent(announcePrinter);
         announceRoll(roll);
         penaltyBox.playerMoves(roll, activePlayer, this);
     }
@@ -85,38 +85,25 @@ public class Game implements GameController {
     void freePlayerAnswersCorrectly() {
         announceCorrectAnswer();
         activePlayer.incrementGoldAmount();
-        announceCurrentPlayerGoldCoins();
+        activePlayer.announceGoldAmount(announcePrinter);
         activePlayer.doesPlayerHaveWinningAmount(this);
     }
 
     void wrongAnswer() {
         announceWrongAnswer();
-        currentPlayerAnnouncer().announceSentInPenaltyBox(announcePrinter);
-        penaltyBox.detain(activePlayer);
+        penaltyBox.detain(activePlayer, announcePrinter);
     }
 
     void turnIsOver() {
         inGamePlayers.nextPlayer();
     }
 
-    private void announceCurrentPlayerGoldCoins() {
-        currentPlayerAnnouncer().announceGoldAmount(announcePrinter);
-    }
-
     private void announceCorrectAnswer() {
         outputStream.println("Answer was correct!!!!");
     }
 
-    private void announceCategory() {
-        new CategoryAnnouncer(getCurrentCategory()).announceCategory(announcePrinter);
-    }
-
     private Category getCurrentCategory() {
         return activePlayer.getPlace().getCategory();
-    }
-
-    private PlayerAnnouncer currentPlayerAnnouncer() {
-        return new PlayerAnnouncer(activePlayer);
     }
 
     private void announceRoll(Roll roll) {

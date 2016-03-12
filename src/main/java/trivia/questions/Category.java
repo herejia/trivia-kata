@@ -1,10 +1,18 @@
 package trivia.questions;
 
+import trivia.announcement.AnnouncePrinter;
+
 public class Category {
     private final String categoryName;
+    private final CategoryAnnouncer categoryAnnouncer;
 
-    public Category(String categoryName) {
+    Category(String categoryName) {
         this.categoryName = categoryName;
+        categoryAnnouncer = new CategoryAnnouncer(this);
+    }
+
+    public void announceCategory(AnnouncePrinter announcePrinter) {
+        categoryAnnouncer.announceCategory(announcePrinter);
     }
 
     @Override
