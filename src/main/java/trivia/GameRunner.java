@@ -1,3 +1,5 @@
+package trivia;
+
 import java.util.Random;
 
 
